@@ -136,7 +136,7 @@ class _SearchViewState extends State<SearchView> {
         return null;
       }
     } catch (e) {
-      printErrorMessage("Error: $e");
+      printErrorMessage("Error: No internet connection.");
       return null;
     }
   }
