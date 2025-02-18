@@ -5,11 +5,27 @@ class ProfileView extends StatelessWidget {
 
   final Map<String, dynamic> userData;
 
+  List<Map<String, dynamic>> buildProjectsList() {
+    var projects = userData['projects_users'];
+    List<Map<String, dynamic>> comletedProjects = [];
+
+    for (var i = 0; i < userData['projects_users'].length; i++) {
+      if (projects[i]['status'] == "finished") {
+        comletedProjects.add({
+          'name': projects[i]['project']['name'],
+          'mark': projects[i]['final_mark'],
+        });
+      }
+    }
+
+    return comletedProjects;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<dynamic> skills = userData['cursus_users'][1]['skills'] ??
         userData['cursus_users'][0]['skills'];
-    List<dynamic> projects = userData['projects_users'];
+    List<Map<String, dynamic>> projects = buildProjectsList();
 
     return Scaffold(
       body: Stack(
@@ -90,35 +106,42 @@ class ProfileView extends StatelessWidget {
                     ),
                   ),
 
-                  // Skills
+                  // Projects
                   Card.filled(
                     color: Colors.white.withAlpha(80),
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.only(top: 12),
                           child: Text(
-                            "Skills",
-                            style: TextStyle(fontSize: 18),
+                            "Completed Projects",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ),
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.28,
                           child: ListView.builder(
-                            padding: const EdgeInsets.all(8),
-                            itemCount: skills.length,
+                            padding: const EdgeInsets.all(16),
+                            itemCount: projects.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                // mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  Text(
-                                    skills[index]['name'],
-                                    style: TextStyle(fontSize: 16),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                        "${projects[index]['name']}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
                                   ),
                                   Text(
-                                    "${skills[index]['level']}",
+                                    "${projects[index]['mark']}",
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -131,15 +154,43 @@ class ProfileView extends StatelessWidget {
                     ),
                   ),
 
-                  // Projects
-                  // ConstrainedBox(
-                  //   constraints: BoxConstraints(
-                  //       maxHeight: MediaQuery.of(context).size.height * 0.3),
-                  //   child: Card(
-                  //     color: Colors.transparent,
-                  //     child: Placeholder(),
-                  //   ),
-                  // ),
+                  // Skills
+                  Card.filled(
+                    color: Colors.white.withAlpha(80),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            "Skills",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.22,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(0),
+                            itemCount: skills.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              double level = skills[index]["level"];
+                              int percentage =
+                                  ((level - level.floor()) * 100).round();
+
+                              return ListTile(
+                                title: Text(
+                                  skills[index]['name'],
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                subtitle: Text(
+                                    "Level: ${level.toStringAsFixed(2)} ($percentage%)"),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
