@@ -33,7 +33,7 @@ class _SearchViewState extends State<SearchView> {
 
   Future<Map<String, dynamic>?> getUserData(String login) async {
     String? accessToken = await getAccessToken();
-    debugPrint(accessToken);
+
     if (accessToken == null) {
       // TODO
       debugPrint("❌ No access token. Cannot fetch data.");
