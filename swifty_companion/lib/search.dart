@@ -31,16 +31,16 @@ class _SearchViewState extends State<SearchView> {
     super.dispose();
   }
 
-  Future<List<dynamic>?> getUserData(String login) async {
+  Future<Map<String, dynamic>?> getUserData(String login) async {
     String? accessToken = await getAccessToken();
-
+    debugPrint(accessToken);
     if (accessToken == null) {
       // TODO
       debugPrint("❌ No access token. Cannot fetch data.");
       return null;
     }
 
-    final url = 'https://api.intra.42.fr/v2/users?filter[login]=$login';
+    final url = 'https://api.intra.42.fr/v2/users/$login';
 
     final response = await http.get(
       Uri.parse(url),
@@ -50,7 +50,6 @@ class _SearchViewState extends State<SearchView> {
     );
 
     if (response.statusCode == 200) {
-      debugPrint("✅ User Data: ${response.body}");
       return jsonDecode(response.body);
     } else {
       // TODO
@@ -60,7 +59,7 @@ class _SearchViewState extends State<SearchView> {
   }
 
   void navigateToProfile() async {
-    List<dynamic>? data = await getUserData(_controller.text);
+    Map<String, dynamic>? data = await getUserData(_controller.text);
 
     if (mounted) {
       Navigator.pushNamed(context, '/profile', arguments: data);

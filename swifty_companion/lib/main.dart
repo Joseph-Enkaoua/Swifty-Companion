@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
       home: SearchView(),
       onGenerateRoute: (settings) {
         if (settings.name == '/profile') {
-          final List<dynamic> userData = settings.arguments as List<dynamic>;
+          final Map<String, dynamic> userData = settings.arguments as Map<String, dynamic>;
           return MaterialPageRoute(
             builder: (context) => ProfileView(userData: userData),
           );
