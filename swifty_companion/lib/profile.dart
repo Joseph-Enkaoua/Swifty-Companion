@@ -91,24 +91,55 @@ class ProfileView extends StatelessWidget {
                   ),
 
                   // Skills
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.3),
-                    child: Card.filled(
-                      color: Colors.white.withAlpha(80),
-                      child: Placeholder(),
+                  Card.filled(
+                    color: Colors.white.withAlpha(80),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Skills",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.28,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(8),
+                            itemCount: skills.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                // mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text(
+                                    skills[index]['name'],
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Text(
+                                    "${skills[index]['level']}",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        )
+                      ],
                     ),
                   ),
 
                   // Projects
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxHeight: MediaQuery.of(context).size.height * 0.3),
-                    child: Card(
-                      color: Colors.transparent,
-                      child: Placeholder(),
-                    ),
-                  ),
+                  // ConstrainedBox(
+                  //   constraints: BoxConstraints(
+                  //       maxHeight: MediaQuery.of(context).size.height * 0.3),
+                  //   child: Card(
+                  //     color: Colors.transparent,
+                  //     child: Placeholder(),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
