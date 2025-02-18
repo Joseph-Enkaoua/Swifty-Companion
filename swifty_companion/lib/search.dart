@@ -61,7 +61,7 @@ class _SearchViewState extends State<SearchView> {
   void navigateToProfile() async {
     Map<String, dynamic>? data = await getUserData(_controller.text);
 
-    if (mounted) {
+    if (mounted && data != null) {
       Navigator.pushNamed(context, '/profile', arguments: data);
     }
     _controller.clear();

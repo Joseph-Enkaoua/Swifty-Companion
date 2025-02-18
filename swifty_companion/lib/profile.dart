@@ -178,6 +178,8 @@ class ProfileView extends StatelessWidget {
                                   ((level - level.floor()) * 100).round();
 
                               return ListTile(
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
                                 title: Text(
                                   skills[index]['name'],
                                   style: TextStyle(fontSize: 16),
