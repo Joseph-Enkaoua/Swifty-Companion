@@ -120,7 +120,7 @@ class ProfileView extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.28,
+                          height: MediaQuery.of(context).size.height * 0.25,
                           child: ListView.builder(
                             padding: const EdgeInsets.all(16),
                             itemCount: projects.length,
@@ -168,7 +168,7 @@ class ProfileView extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.22,
+                          height: MediaQuery.of(context).size.height * 0.25,
                           child: ListView.builder(
                             padding: const EdgeInsets.all(0),
                             itemCount: skills.length,

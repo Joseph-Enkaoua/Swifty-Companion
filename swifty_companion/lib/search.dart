@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:swifty_companion/main.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SearchView extends StatefulWidget {
   const SearchView({super.key});
@@ -12,8 +12,9 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
-  final TextEditingController _controller = TextEditingController();
   bool _hasText = false;
+  final _storage = FlutterSecureStorage();
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -31,29 +32,111 @@ class _SearchViewState extends State<SearchView> {
     super.dispose();
   }
 
-  Future<Map<String, dynamic>?> getUserData(String login) async {
-    String? accessToken = await getAccessToken();
+  void printErrorMessage(String msg) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Align(
+            child: Text(
+              msg,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.red, fontSize: 18),
+            ),
+          ),
+          backgroundColor: Colors.white,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
 
-    if (accessToken == null) {
-      // TODO
-      debugPrint("❌ No access token. Cannot fetch data.");
-      return null;
+  // Get the stored token, or request a new one if expired
+  Future<String?> getAccessToken() async {
+    String? token = await _storage.read(key: "access_token");
+    String? expiration = await _storage.read(key: "token_expiration");
+
+    if (token != null && expiration != null) {
+      DateTime expirationTime = DateTime.parse(expiration);
+
+      if (DateTime.now().isBefore(expirationTime)) {
+        return token;
+      }
     }
 
-    final url = 'https://api.intra.42.fr/v2/users/$login';
+    return await fetchNewToken();
+  }
 
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        "Authorization": "Bearer $accessToken",
-      },
-    );
+  // Request a new token and store it securely
+  Future<String?> fetchNewToken() async {
+    try {
+      final response = await http.post(
+        Uri.parse(dotenv.get('42TOKENURL')),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: {
+          "grant_type": "client_credentials",
+          "client_id": dotenv.get('42UID'),
+          "client_secret": dotenv.get('42SECRET'),
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      // TODO
-      debugPrint("❌ Failed to fetch data: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        String accessToken = data["access_token"];
+        int expiresIn = data["expires_in"];
+
+        // Calculate expiration time
+        DateTime expirationTime =
+            DateTime.now().add(Duration(seconds: expiresIn));
+
+        // Store the token and its expiration securely
+        await _storage.write(key: "access_token", value: accessToken);
+        await _storage.write(
+            key: "token_expiration", value: expirationTime.toIso8601String());
+
+        return accessToken;
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        printErrorMessage("${response.statusCode}: ${responseData["error"]}");
+        return null;
+      }
+    } catch (e) {
+      printErrorMessage(
+          "Error fetching token: Please connect to the interent and try again");
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserData(String login) async {
+    try {
+      String? accessToken = await getAccessToken();
+
+      if (accessToken == null) {
+        return null;
+      }
+
+      final url = dotenv.get('42USERURL') + login;
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Authorization": "Bearer $accessToken",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else if (response.statusCode == 404) {
+        printErrorMessage("User not found.");
+        return null;
+      } else {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        printErrorMessage(responseData["error"]);
+        return null;
+      }
+    } catch (e) {
+      printErrorMessage("Error: $e");
       return null;
     }
   }
