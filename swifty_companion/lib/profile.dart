@@ -49,6 +49,8 @@ class ProfileView extends StatelessWidget {
                 children: [
                   // Profile picture and name
                   Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         decoration: BoxDecoration(

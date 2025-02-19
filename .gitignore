@@ -1,3 +1,4 @@
 swifty_companion/.env
 .DS_Store
 logs/instrum.txt
+swifty_companion/logs/
