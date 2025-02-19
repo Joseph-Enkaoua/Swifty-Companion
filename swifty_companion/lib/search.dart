@@ -142,6 +142,10 @@ class _SearchViewState extends State<SearchView> {
   }
 
   void navigateToProfile() async {
+    if (_controller.text == "") {
+      return;
+    }
+
     Map<String, dynamic>? data = await getUserData(_controller.text);
 
     if (mounted && data != null) {
