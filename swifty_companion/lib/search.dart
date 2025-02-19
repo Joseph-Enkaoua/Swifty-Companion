@@ -153,6 +153,7 @@ class _SearchViewState extends State<SearchView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           Container(
@@ -170,7 +171,9 @@ class _SearchViewState extends State<SearchView> {
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      vertical: MediaQuery.of(context).size.height * 0.12,
+                      vertical: MediaQuery.of(context).viewInsets.bottom > 0
+                          ? MediaQuery.of(context).size.height * 0.08
+                          : MediaQuery.of(context).size.height * 0.12,
                     ),
                     child: Column(
                       children: [
